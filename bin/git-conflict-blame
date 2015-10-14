@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+
+# This needs a lot of work.  It was VERY quickly slapped together!
+
+require 'git'
+require 'colorize'
+
+begin
+  git = Git.open( '.' )
+  status = git.status
+  changed = status.changed
+  unmerged = changed.select { |filename, data| data.stage.to_i == 3 }
+rescue Exception => e
+  puts 'Could not find valid GIT repo!'
+  exit 1
+end
+
+data = {}
+unmerged.keys.each do |filename|
+  raw = `git blame --show-email -c --date short #{filename}`
+
+  start_indexes = []
+  end_indexes = []
+  lines = raw.split( "\n" )
+  lines.each do |line|
+    start_indexes << lines.index( line ) if line.include?( '<<<<<<<' )
+    end_indexes   << lines.index( line ) if line.include?( '>>>>>>>' )
+  end
+
+  index = 0
+  all_lines = []
+  start_indexes.count.times do
+    start_index = start_indexes[index]
+    end_index = end_indexes[index]
+    all_lines << lines[start_index..end_index]
+    index += 1
+  end
+
+  data[filename] = all_lines
+end
+
+data.delete_if { |_, all_lines| all_lines.nil? || all_lines.empty? }
+
+data.each do |filename, conflicts|
+  puts filename.green
+  conflicts.each do |lines|
+    lines.each do |line|
+      line_array = line.split( "\t" )
+
+      commit_id = line_array[0]
+      email     = line_array[1].delete( "(" )[0..30]
+      date      = line_array[2]
+
+      git_info = [commit_id, email, date]
+      raw_line = line_array[3..999].join( "\t" )
+      raw_line_array = raw_line.split( ")" )
+      line_number = raw_line_array.first
+      raw_line_string = raw_line_array[1..999].join( ")" )
+
+      formatted_git_info =  "\t%-10s %-30s %-13s" % git_info
+      if raw_line.include?( '<<<<<<<' ) || raw_line.include?( '>>>>>>>' )
+        raw_line_string = raw_line_string.red
+      elsif raw_line.include?( '=======' )
+        raw_line_string = raw_line_string.yellow
+      else
+        raw_line_string = raw_line_string.light_blue
+      end
+      puts "%s [%-22s]  %-s" % [formatted_git_info, line_number.bold, raw_line_string]
+      puts if raw_line.include?( '>>>>>>>' )
+    end
+  end
+end
