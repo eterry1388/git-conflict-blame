@@ -46,7 +46,7 @@ nothing will be displayed.
 git conflict-blame
 ```
 
-### To see this:
+#### To see this:
 
 ```
 1 files in conflict found!
@@ -75,7 +75,7 @@ README.md
 git conflict-blame --json
 ```
 
-### To see this:
+#### To see this:
 
 ```json
 {"exception":false,"count":1,"data":{"app.rb":[[{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":7,"line_content":"<<<<<<< HEAD"},{"commit_id":"ad3e1b25","email":"eterry1388@aol.com","date":"2015-10-15","line_number":8,"line_content":"output = add( 5, 6 "},{"commit_id":"ad3e1b25","email":"eterry1388@aol.com","date":"2015-10-15","line_number":9,"line_content":"puts output"},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":10,"line_content":"======="},{"commit_id":"b8fb28f1","email":"eterry1388@aol.com","date":"2015-10-15","line_number":11,"line_content":"puts add( 5, 6 "},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":12,"line_content":">>>>>>> master"}]]}}
@@ -89,7 +89,7 @@ git conflict-blame --json
 git conflict-blame --json --pretty
 ```
 
-### To see this:
+#### To see this:
 
 ```json
 {
