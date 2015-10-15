@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Git Conflict Blame'
   spec.description   = 'Git command that shows the blame on the lines that are in conflict'
-  spec.homepage      = 'https://github.com/eterry1388/git-conflict-blame'
+  spec.homepage      = 'http://eterry1388.github.io/git-conflict-blame'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split( "\x0" ).reject { |f| f.match( %r{^(test|spec|features)/} ) }
