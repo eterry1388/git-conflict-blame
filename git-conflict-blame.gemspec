@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec'
 
-  spec.add_dependency 'git'
+  spec.add_dependency 'rugged'
   spec.add_dependency 'colorize'
+  spec.add_dependency 'nesty'
 end
