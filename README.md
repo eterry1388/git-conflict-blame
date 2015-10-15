@@ -53,17 +53,17 @@ git conflict-blame
 Parsing files to find out who is to blame...
 app.rb
   00000000   not.committed.yet              2015-10-15    [7     ]  <<<<<<< HEAD
-  ad3e1b25   eterry1388@aol.com             2015-10-15    [8     ]  output = add( 5, 6 
-  ad3e1b25   eterry1388@aol.com             2015-10-15    [9     ]  puts output
+  ad3e1b25   bob.fred@example.com           2015-10-15    [8     ]  output = add( 5, 6 
+  ad3e1b25   bob.fred@example.com           2015-10-15    [9     ]  puts output
   00000000   not.committed.yet              2015-10-15    [10    ]  =======
-  b8fb28f1   eterry1388@aol.com             2015-10-15    [11    ]  puts add( 5, 6 
+  b8fb28f1   bob.fred@example.com           2015-10-15    [11    ]  puts add( 5, 6 
   00000000   not.committed.yet              2015-10-15    [12    ]  >>>>>>> master
 
 README.md
   00000000   not.committed.yet              2015-10-15    [1     ]  <<<<<<< HEAD
-  db0d9920   eterry1388@aol.com             2015-10-15    [2     ]  My totally awesome readme file!
+  db0d9920   bob.fred@example.com           2015-10-15    [2     ]  My totally awesome readme file!
   00000000   not.committed.yet              2015-10-15    [6     ]  =======
-  2e9fcc79   eterry1388@aol.com             2015-10-15    [7     ]  My awesome readme file for everyone!
+  2e9fcc79   bob.fred@example.com           2015-10-15    [7     ]  My awesome readme file for everyone!
   00000000   not.committed.yet              2015-10-15    [10    ]  >>>>>>> master
 ```
 
@@ -78,7 +78,7 @@ git conflict-blame --json
 #### To see this:
 
 ```json
-{"exception":false,"count":1,"data":{"app.rb":[[{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":7,"line_content":"<<<<<<< HEAD"},{"commit_id":"ad3e1b25","email":"eterry1388@aol.com","date":"2015-10-15","line_number":8,"line_content":"output = add( 5, 6 "},{"commit_id":"ad3e1b25","email":"eterry1388@aol.com","date":"2015-10-15","line_number":9,"line_content":"puts output"},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":10,"line_content":"======="},{"commit_id":"b8fb28f1","email":"eterry1388@aol.com","date":"2015-10-15","line_number":11,"line_content":"puts add( 5, 6 "},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":12,"line_content":">>>>>>> master"}]]}}
+{"exception":false,"count":1,"data":{"app.rb":[[{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":7,"line_content":"<<<<<<< HEAD"},{"commit_id":"ad3e1b25","email":"bob.fred@example.com","date":"2015-10-15","line_number":8,"line_content":"output = add( 5, 6 "},{"commit_id":"ad3e1b25","email":"bob.fred@example.com","date":"2015-10-15","line_number":9,"line_content":"puts output"},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":10,"line_content":"======="},{"commit_id":"b8fb28f1","email":"bob.fred@example.com","date":"2015-10-15","line_number":11,"line_content":"puts add( 5, 6 "},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":12,"line_content":">>>>>>> master"}]]}}
 ```
 
 ### To output pretty machine-readable data
@@ -107,14 +107,14 @@ git conflict-blame --json --pretty
         },
         {
           "commit_id": "ad3e1b25",
-          "email": "eterry1388@aol.com",
+          "email": "bob.fred@example.com",
           "date": "2015-10-15",
           "line_number": 8,
           "line_content": "output = add( 5, 6 "
         },
         {
           "commit_id": "ad3e1b25",
-          "email": "eterry1388@aol.com",
+          "email": "bob.fred@example.com",
           "date": "2015-10-15",
           "line_number": 9,
           "line_content": "puts output"
@@ -128,7 +128,7 @@ git conflict-blame --json --pretty
         },
         {
           "commit_id": "b8fb28f1",
-          "email": "eterry1388@aol.com",
+          "email": "bob.fred@example.com",
           "date": "2015-10-15",
           "line_number": 11,
           "line_content": "puts add( 5, 6 "
