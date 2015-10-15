@@ -28,7 +28,7 @@ class GitConflictBlame
   def run!
     Dir.chdir( @repo.workdir )
     raise GitError, 'No conflicts found' unless conflicts?
-    log "#{conflicts.count} conflicts found!".red
+    log "#{conflicts.count} files in conflict found!".red
     log "Parsing files to find out who is to blame..."
     data = find_conflict_blames
     if @json
@@ -74,7 +74,7 @@ class GitConflictBlame
   #
   # @param e [Exception]
   # @param message [String] Error message
-  def log_error( e, message: )
+  def log_error( e, message: '' )
     if @json
       message = "#{e.message}\n#{message}" 
       error_hash = {
