@@ -2,4 +2,33 @@
 
 require 'git-conflict-blame'
 
-GitConflictBlame.run( ARGV )
+def show_version
+  require 'git-conflict-blame/version'
+  puts "git-conflict-blame #{GitConflictBlame::VERSION}"
+end
+
+show_help = ARGV.include?( '--help' ) || ARGV.include?( '-h' )
+if show_help
+  show_version
+  puts
+  puts 'Git command that shows the blame on the lines that are in conflict.'
+  puts 'This should be ran after a "git merge" command has been ran and there'
+  puts 'are files that are in conflict.'
+  puts
+  puts 'Usage: git conflict-blame [options]'
+  puts "\t -j, --json    \t Output machine-readable data"
+  puts "\t -p, --pretty  \t Output in pretty format (only valid if using '--json')"
+  puts "\t -v, --version \t Show the version of this tool"
+  puts "\t -h, --help    \t Show this message"
+  exit 0
+end
+
+if ARGV.include?( '--version' ) || ARGV.include?( '-v' )
+  show_version
+  exit 0
+end
+
+json        = ARGV.include?( '--json' )   || ARGV.include?( '-j' )
+pretty_json = ARGV.include?( '--pretty' ) || ARGV.include?( '-p' )
+
+GitConflictBlame.run( json: json, pretty_json: pretty_json )

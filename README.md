@@ -18,8 +18,22 @@ gem install git-conflict-blame
 Run this inside a directory of your git repository. If there are no conflicts,
 nothing will be displayed.
 
+To output in a colorized pretty format:
+
 ```bash
 git conflict-blame
+```
+
+To output machine-readable data:
+
+```bash
+git conflict-blame --json
+```
+
+To output pretty machine-readable data:
+
+```bash
+git conflict-blame --json --pretty
 ```
 
 ## Contributing
