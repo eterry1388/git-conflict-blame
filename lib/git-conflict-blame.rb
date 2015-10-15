@@ -4,20 +4,27 @@ require 'colorize'
 require 'open3'
 require 'json'
 
+# Git command that shows the blame on the lines that are in conflict. This should be ran
+# after a "git merge" command has been ran and there are files that are in conflict.
 class GitConflictBlame
 
+  # @param json [Boolean] Whether or not to output in JSON format
+  # @param pretty_json [Boolean] Whether or not to output in pretty JSON format
   def initialize( json: false, pretty_json: false )
     @json        = json
     @pretty_json = pretty_json
     @current_dir = Dir.pwd
     @repo = Rugged::Repository.discover( @current_dir )
-    run!
   end
 
+  # Main public method to run on the class
+  #
+  # @param options [Hash] Run options
   def self.run( options )
-    new( options )
+    new( options ).run!
   end
 
+  # Actually performs the conflict blame
   def run!
     Dir.chdir( @repo.workdir )
     raise GitError, 'No conflicts found' unless conflicts?
@@ -54,11 +61,19 @@ class GitConflictBlame
 
   private
 
+  # Outputs a message
+  #
+  # @note This will not output anything if @json is set!
+  # @param message [String]
   def log( message = '' )
     return if @json
     puts message
   end
 
+  # Outputs an error message
+  #
+  # @param e [Exception]
+  # @param message [String] Error message
   def log_error( e, message: )
     if @json
       message = "#{e.message}\n#{message}" 
@@ -74,7 +89,7 @@ class GitConflictBlame
     end
   end
 
-  # Run a command.
+  # Run a command
   #
   # @param command [String] the command to run
   # @raise [CmdError] if command is not successful
@@ -89,18 +104,31 @@ class GitConflictBlame
     raise CmdError, "Command: '#{command}', Error: '#{e}'"
   end
 
+  # Figures out if there are any conflicts in the git repo
+  #
+  # @return [Boolean]
   def conflicts?
     @repo.index.conflicts?
   end
 
+  # Gets all the filenames that are in conflict
+  #
+  # @return [Array<String>]
   def conflicts
     @conflicts ||= @repo.index.conflicts.map { |conflict| conflict[:ours][:path] }
   end
 
+  # Runs the "git blame" command
+  #
+  # @param filename [String]
+  # @return [String] Raw results of the "git blame" command
   def raw_blame( filename )
     cmd( "git blame --show-email -c --date short #{filename}" )
   end
 
+  # Parses through the conflicted files and finds the blame on each line
+  #
+  # @return [Hash]
   def find_conflict_blames
     data = {}
     conflicts.each do |conflict|
@@ -128,10 +156,18 @@ class GitConflictBlame
     data
   end
 
+  # Iterates through a line set and parses them
+  #
+  # @param lines [Array<String>]
+  # @return [Array<Hash>]
   def parse_lines( lines )
     lines.map { |line| parse_line( line ) }
   end
 
+  # Parses a line from the "git blame" command
+  #
+  # @param line [String]
+  # @return [Hash]
   def parse_line( line )
     line_array = line.split( "\t" )
     commit_id = line_array[0]
@@ -151,6 +187,9 @@ class GitConflictBlame
     }
   end
 
+  # Outputs a Hash in JSON format
+  #
+  # @param hash [Hash]
   def output_json( hash )
     if @pretty_json
       puts JSON.pretty_generate( hash )
@@ -159,6 +198,9 @@ class GitConflictBlame
     end
   end
 
+  # Outputs the results of {#find_conflict_blames} to the console
+  #
+  # @param data [Hash]
   def display_results( data )
     data.each do |filename, conflicts|
       log filename.green
