@@ -27,10 +27,12 @@ libraries and/or headers.  Check the mkmf.log file for more details.  You may
 need configuration options.
 ```
 
-Try running this (if you are on a Debian-based OS):
+Try running one of these (depending on your OS):
 
 ```bash
 sudo apt-get install cmake
+yum install cmake
+brew install cmake
 ```
 
 ## Usage
@@ -49,8 +51,10 @@ git conflict-blame
 #### To see this:
 
 ```
-1 files in conflict found!
+2 files are in conflict
 Parsing files to find out who is to blame...
+2 total conflicts found!
+
 app.rb
   00000000   not.committed.yet              2015-10-15    [7     ]  <<<<<<< HEAD
   ad3e1b25   bob.fred@example.com           2015-10-15    [8     ]  output = add( 5, 6 
@@ -78,7 +82,7 @@ git conflict-blame --json
 #### To see this:
 
 ```json
-{"exception":false,"count":1,"data":{"app.rb":[[{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":7,"line_content":"<<<<<<< HEAD"},{"commit_id":"ad3e1b25","email":"bob.fred@example.com","date":"2015-10-15","line_number":8,"line_content":"output = add( 5, 6 "},{"commit_id":"ad3e1b25","email":"bob.fred@example.com","date":"2015-10-15","line_number":9,"line_content":"puts output"},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":10,"line_content":"======="},{"commit_id":"b8fb28f1","email":"bob.fred@example.com","date":"2015-10-15","line_number":11,"line_content":"puts add( 5, 6 "},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":12,"line_content":">>>>>>> master"}]]}}
+{"exception":false,"file_count":1,"total_count":1,"data":{"app.rb":[[{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":7,"line_content":"<<<<<<< HEAD"},{"commit_id":"ad3e1b25","email":"bob.fred@example.com","date":"2015-10-15","line_number":8,"line_content":"output = add( 5, 6 "},{"commit_id":"ad3e1b25","email":"bob.fred@example.com","date":"2015-10-15","line_number":9,"line_content":"puts output"},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":10,"line_content":"======="},{"commit_id":"b8fb28f1","email":"bob.fred@example.com","date":"2015-10-15","line_number":11,"line_content":"puts add( 5, 6 "},{"commit_id":"00000000","email":"not.committed.yet","date":"2015-10-15","line_number":12,"line_content":">>>>>>> master"}]]}}
 ```
 
 ### To output pretty machine-readable data
@@ -94,7 +98,8 @@ git conflict-blame --json --pretty
 ```json
 {
   "exception": false,
-  "count": 1,
+  "file_count": 1,
+  "total_count": 1,
   "data": {
     "app.rb": [
       [

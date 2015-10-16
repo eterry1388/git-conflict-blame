@@ -26,20 +26,29 @@ class GitConflictBlame
 
   # Actually performs the conflict blame
   def run!
-    Dir.chdir( @repo.workdir )
-    raise GitError, 'No conflicts found' unless conflicts?
-    log "#{conflicts.count} files in conflict found!".red
-    log "Parsing files to find out who is to blame..."
-    data = find_conflict_blames
-    if @json
-      json_data = {
-        exception: false,
-        count:     conflicts.count,
-        data:      data
-      }
-      output_json( json_data )
+    if conflicts?
+      Dir.chdir( @repo.workdir )
+      log "#{conflicts.count} files are in conflict".red
+      log "Parsing files to find out who is to blame..."
+      data, total_conflicts = find_conflict_blames
+      if total_conflicts == 0
+        log "All conflicts appear to be resolved".green
+      else
+        log "#{total_conflicts} total conflicts found!\n".red
+      end
+      if @json
+        json_data = {
+          exception:   false,
+          file_count:  conflicts.count,
+          total_count: total_conflicts,
+          data:        data
+        }
+        output_json( json_data )
+      else
+        display_results( data )
+      end
     else
-      display_results( data )
+      log 'No conflicts found'.green
     end
   rescue GitError => e
     log_error( e )
@@ -128,9 +137,10 @@ class GitConflictBlame
 
   # Parses through the conflicted files and finds the blame on each line
   #
-  # @return [Hash]
+  # @return [Array] [data_hash, conflict_count]
   def find_conflict_blames
     data = {}
+    total_conflicts = 0
     conflicts.each do |conflict|
       raw = raw_blame( conflict )
       start_indexes = []
@@ -150,10 +160,11 @@ class GitConflictBlame
         all_line_sets << parse_lines( line_set )
         index += 1
       end
+      total_conflicts += start_indexes.count
       data[conflict] = all_line_sets
     end
     data.delete_if { |_, all_line_sets| all_line_sets.nil? || all_line_sets.empty? }
-    data
+    [data, total_conflicts]
   end
 
   # Iterates through a line set and parses them
