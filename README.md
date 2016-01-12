@@ -1,5 +1,10 @@
 # Git Conflict Blame
 
+[![Gem Version](https://badge.fury.io/rb/git-conflict-blame.svg)](https://badge.fury.io/rb/git-conflict-blame)
+![](http://ruby-gem-downloads-badge.herokuapp.com/git-conflict-blame?type=total)
+[![Inline docs](http://inch-ci.org/github/eterry1388/git-conflict-blame.svg?branch=master)](http://inch-ci.org/github/eterry1388/git-conflict-blame)
+[![Dependency Status](https://gemnasium.com/eterry1388/git-conflict-blame.svg)](https://gemnasium.com/eterry1388/git-conflict-blame)
+
 Git command that shows the blame on the lines that are in conflict. This should be ran
 after a `git merge` command has been ran and there are files that are in conflict.
 
