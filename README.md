@@ -37,6 +37,7 @@ Try running one of these (depending on your OS):
 ```bash
 sudo apt-get install cmake
 yum install cmake
+dnf install cmake
 brew install cmake
 ```
 
@@ -50,7 +51,7 @@ nothing will be displayed.
 #### Run this:
 
 ```bash
-git conflict-blame
+git conflict-blame | more
 ```
 
 #### To see this:

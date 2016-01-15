@@ -28,18 +28,32 @@ class GitConflictBlame
   def run!
     if conflicts?
       Dir.chdir( @repo.workdir )
-      log "#{conflicts.count} files are in conflict".red
+      log "#{conflict_count} files are in conflict".red
       log "Parsing files to find out who is to blame..."
       data, total_conflicts = find_conflict_blames
+
       if total_conflicts == 0
-        log "All conflicts appear to be resolved".green
+        if conflict_count == 0
+          log "All conflicts appear to be resolved".green
+        else
+          log "\nThere are #{conflict_count} files in conflict that cannot be blamed:".red
+          remaining_conflicted_files = cmd( 'git diff --name-only --diff-filter=U' )
+          log remaining_conflicted_files
+          if @json
+            data = {}
+            remaining_conflicted_files.split( "\n" ).each do |file_name|
+              data[file_name] = 'conflict cannot be blamed'
+            end
+          end
+        end
       else
         log "#{total_conflicts} total conflicts found!\n".red
       end
+
       if @json
         json_data = {
           exception:   false,
-          file_count:  conflicts.count,
+          file_count:  conflict_count,
           total_count: total_conflicts,
           data:        data
         }
@@ -124,7 +138,17 @@ class GitConflictBlame
   #
   # @return [Array<String>]
   def conflicts
-    @conflicts ||= @repo.index.conflicts.map { |conflict| conflict[:ours][:path] }
+    @conflicts ||= @repo.index.conflicts.map do |conflict|
+      ours = conflict[:ours]
+      ours[:path] if ours
+    end.compact
+  end
+
+  # Gets the total number of files that are in conflict
+  #
+  # @return [Integer] Number of files in conflict
+  def conflict_count
+    @conflict_count ||= @repo.index.conflicts.count
   end
 
   # Runs the "git blame" command
@@ -141,29 +165,36 @@ class GitConflictBlame
   def find_conflict_blames
     data = {}
     total_conflicts = 0
-    conflicts.each do |conflict|
-      raw = raw_blame( conflict )
-      start_indexes = []
-      end_indexes = []
-      lines = raw.split( "\n" )
-      lines.each do |line|
-        start_indexes << lines.index( line ) if line.include?( '<<<<<<<' )
-        end_indexes   << lines.index( line ) if line.include?( '>>>>>>>' )
-      end
 
-      index = 0
-      all_line_sets = []
-      start_indexes.count.times do
-        start_index = start_indexes[index]
-        end_index = end_indexes[index]
-        line_set = lines[start_index..end_index]
-        all_line_sets << parse_lines( line_set )
-        index += 1
+    conflicts.each do |conflict|
+      begin
+        raw = raw_blame( conflict )
+        start_indexes = []
+        end_indexes = []
+        lines = raw.split( "\n" )
+        lines.each do |line|
+          start_indexes << lines.index( line ) if line.include?( '<<<<<<<' )
+          end_indexes   << lines.index( line ) if line.include?( '>>>>>>>' )
+        end
+
+        index = 0
+        all_line_sets = []
+        start_indexes.count.times do
+          start_index = start_indexes[index]
+          end_index = end_indexes[index]
+          line_set = lines[start_index..end_index]
+          all_line_sets << parse_lines( line_set )
+          index += 1
+        end
+        total_conflicts += start_indexes.count
+        data[conflict] = all_line_sets
+      rescue ArgumentError
+        # Do nothing
+        # Caused by encoding issues like "invalid byte sequence in UTF-8"
       end
-      total_conflicts += start_indexes.count
-      data[conflict] = all_line_sets
     end
     data.delete_if { |_, all_line_sets| all_line_sets.nil? || all_line_sets.empty? }
+
     [data, total_conflicts]
   end
 
