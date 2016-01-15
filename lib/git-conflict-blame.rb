@@ -28,6 +28,7 @@ class GitConflictBlame
   def run!
     if conflicts?
       Dir.chdir( @repo.workdir )
+      @submodules = find_submodules
       log "#{conflict_count} files are in conflict".red
       log "Parsing files to find out who is to blame..."
       data, total_conflicts = find_conflict_blames
@@ -159,6 +160,20 @@ class GitConflictBlame
     cmd( "git blame --show-email -c --date short #{filename}" )
   end
 
+  # Find all submodules in git repo
+  #
+  # @return [Array] List of submodule paths
+  def find_submodules
+    submodules = []
+    current_dir = Dir.pwd
+    Dir.chdir( @repo.workdir )
+    if File.exists?( '.gitmodules' )
+      submodules = cmd( "grep path .gitmodules | sed 's/.*= //'" ).split( "\n" )
+    end
+    Dir.chdir( current_dir )
+    submodules
+  end
+
   # Parses through the conflicted files and finds the blame on each line
   #
   # @return [Array] [data_hash, conflict_count]
@@ -168,6 +183,7 @@ class GitConflictBlame
 
     conflicts.each do |conflict|
       begin
+        next if @submodules.include?( conflict )
         raw = raw_blame( conflict )
         start_indexes = []
         end_indexes = []
